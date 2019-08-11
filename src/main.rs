@@ -1,5 +1,6 @@
 use chrono::NaiveDateTime;
 use log::debug;
+use reqwest::Client;
 use serde::Deserialize;
 use std::{error::Error, fs::read_to_string, path::PathBuf, thread::sleep, time::Duration};
 use structopt::StructOpt;
@@ -42,13 +43,41 @@ struct Response {
     docs: Vec<Doc>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 struct Doc {
     id: String,
     g: String,
     a: String,
     v: String,
     timestamp: usize,
+}
+
+trait Resolver {
+    fn fetch_version(
+        &self,
+        group: String,
+        artifact: String,
+        version: String,
+    ) -> reqwest::Result<Option<Doc>>;
+}
+
+impl Resolver for Client {
+    fn fetch_version(
+        &self,
+        group: String,
+        artifact: String,
+        version: String,
+    ) -> reqwest::Result<Option<Doc>> {
+        let url = format!(
+            "http://search.maven.org/solrsearch/select?q=g:%22{group}%22+AND+a:%22{artifact}%22+AND+v:%22{version}%22&wt=json",
+            group = group,
+            artifact = artifact,
+            version = version
+        );
+        debug!("{}", url);
+        let result: Results = self.get(&url).send()?.json()?;
+        Ok(result.response.docs.first().cloned())
+    }
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -66,17 +95,10 @@ fn main() -> Result<(), Box<dyn Error>> {
             module,
             rev,
         } = dependency;
-        let url = format!(
-            "http://search.maven.org/solrsearch/select?q=g:%22{group}%22+AND+a:%22{artifact}%22+AND+v:%22{version}%22&wt=json",
-            group = org,
-            artifact = name.or(module).unwrap_or_default(),
-            version = rev
-        );
-        debug!("{}", url);
-        let result: Results = client.get(&url).send()?.json()?;
-        for Doc {
+
+        if let Some(Doc {
             g, a, v, timestamp, ..
-        } in result.response.docs
+        }) = client.fetch_version(org, name.or(module).unwrap_or_default(), rev)?
         {
             let time = NaiveDateTime::from_timestamp(timestamp as i64 / 1000, 0);
             println!("{:?} {}/{}@{}", time, g, a, v);
