@@ -48,7 +48,7 @@ impl Into<Version> for Doc {
 }
 
 pub trait Resolver {
-    fn version_info(
+    fn pinned_version(
         &self,
         group: String,
         artifact: String,
@@ -63,7 +63,7 @@ pub trait Resolver {
 }
 
 impl Resolver for Client {
-    fn version_info(
+    fn pinned_version(
         &self,
         group: String,
         artifact: String,

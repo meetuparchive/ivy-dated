@@ -40,7 +40,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 rev,
             } = dependency;
             let artifact = name.or(module).unwrap_or_default();
-            match client.version_info(org.clone(), artifact.clone(), rev.clone())? {
+            match client.pinned_version(org.clone(), artifact.clone(), rev.clone())? {
                 Some(pinned) => {
                     if let Some(latest) = client.latest_version(org.clone(), artifact.clone())? {
                         let current = latest.version == pinned.version;
