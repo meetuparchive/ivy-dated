@@ -11,6 +11,8 @@ use crate::{
     resolve::Resolver,
 };
 
+const REQUEST_DELAY: Duration = Duration::from_millis(200);
+
 #[derive(StructOpt, Debug)]
 #[structopt(name = "ivy-dated", about = "how dated are your ivy dependecies?")]
 struct Options {
@@ -78,7 +80,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                         )
                     }
                 }
-                sleep(Duration::from_millis(200));
+                sleep(REQUEST_DELAY);
                 Ok(stats)
             });
     let Stats {
