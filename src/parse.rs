@@ -12,7 +12,7 @@ struct Dependencies {
     pub data: Vec<Dependency>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Default)]
 pub struct Dependency {
     pub org: String,
     pub name: Option<String>,
@@ -51,5 +51,48 @@ impl Parser for DefaultParser {
         Ok(serde_xml_rs::from_str::<IvyModule>(&contents)?
             .dependencies
             .data)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn default_parser_parses() -> Result<(), Box<dyn Error>>{
+        let deps = DefaultParser.parse("tests/data/ivy.xml".into())?;
+        assert_eq!(deps.len(), 2);
+        Ok(())
+    }
+
+    #[test]
+    fn fullname_combines_components_for_display() {
+        for (case, expect) in vec![
+            (
+                Dependency {
+                    org: "foo".into(),
+                    ..Dependency::default()
+                },
+                "foo/?",
+            ),
+            (
+                Dependency {
+                    org: "foo".into(),
+                    module: Some("bar".into()),
+                    ..Dependency::default()
+                },
+                "foo/bar",
+            ),
+            (
+                Dependency {
+                    org: "foo".into(),
+                    name: Some("bar".into()),
+                    ..Dependency::default()
+                },
+                "foo/bar",
+            ),
+        ] {
+            assert_eq!(case.fullname(), expect);
+        }
     }
 }
