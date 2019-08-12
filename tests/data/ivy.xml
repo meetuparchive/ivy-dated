@@ -1,12 +1,13 @@
-<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+<ivy-module version="2.0" 
+	xmlns:m="http://ant.apache.org/ivy/maven">
 	<info organisation="com.company" module="module" />
-  <configurations>
-    <conf name="luna" />
- </configurations>
-  <dependencies>
-    <dependency org="com.foo" name="bar" rev="1.0.0" conf="luna->default" />
-    <dependency org="org.baz" name="zoom" rev="1.0.1" conf="luna->default">
-      <exclude name="bar" />
-    </dependency>
+	<configurations>
+		<conf name="luna" />
+	</configurations>
+	<dependencies>
+		<dependency org="com.foo" name="bar" rev="1.0.0" conf="luna->default" />
+		<dependency org="org.baz" name="zoom" rev="1.0.1" conf="luna->default">
+			<exclude name="bar" />
+		</dependency>
 	</dependencies>
 </ivy-module>
