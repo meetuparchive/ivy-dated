@@ -59,7 +59,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn default_parser_parses() -> Result<(), Box<dyn Error>>{
+    fn default_parser_parses() -> Result<(), Box<dyn Error>> {
         let deps = DefaultParser.parse("tests/data/ivy.xml".into())?;
         assert_eq!(deps.len(), 2);
         Ok(())

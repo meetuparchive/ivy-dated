@@ -35,6 +35,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         dependencies
             .into_iter()
             .try_fold(Stats::default(), |mut stats, dependency| {
+                let fullname = dependency.fullname();
                 let Dependency {
                     org,
                     name,
@@ -51,20 +52,18 @@ fn main() -> Result<(), Box<dyn Error>> {
                             if current {
                                 stats.current += 1;
                                 println!(
-                                    "{} {}/{}@{} 👌",
+                                    "{} {}@{} 👌",
                                     pinned.publish_time.to_string().bright_black(),
-                                    pinned.group.bold(),
-                                    pinned.artifact.bold(),
+                                    fullname,
                                     pinned.version.bold(),
                                 )
                             } else {
                                 stats.dated += 1;
                                 let lag = pinned.publish_time - latest.publish_time;
                                 println!(
-                                    "{} {}/{}@{} -> {} upgrade available {}",
+                                    "{} {}@{} -> {} upgrade available {}",
                                     pinned.publish_time.to_string().bright_black(),
-                                    pinned.group.bold(),
-                                    pinned.artifact.bold(),
+                                    fullname.bold(),
                                     pinned.version.bold().bright_yellow(),
                                     latest.version.bold().bright_green(),
                                     HumanTime::from(lag).to_string().bold()
@@ -75,9 +74,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                     _ => {
                         stats.unknown += 1;
                         println!(
-                            "⚠️ no information found on {} {}@{}",
-                            org,
-                            artifact.bold(),
+                            "⚠️ no information found on {}@{}",
+                            fullname.bold(),
                             rev.bold()
                         )
                     }
