@@ -36,7 +36,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let stats: Result<Stats, Box<dyn Error>> =
         dependencies
             .into_iter()
-            .try_fold(Stats::default(), |mut stats, dependency| {
+            .try_fold(Stats::default(), |stats, dependency| {
+                sleep(REQUEST_DELAY);
                 let fullname = dependency.fullname();
                 let Dependency {
                     org,
@@ -45,43 +46,45 @@ fn main() -> Result<(), Box<dyn Error>> {
                     rev,
                 } = dependency;
                 let artifact = name.or(module).unwrap_or_default();
-                match client.pinned_version(&org, &artifact, &rev)? {
-                    Some(pinned) => {
-                        if let Some(latest) = client.latest_version(&org, &artifact)? {
-                            let current = latest.version == pinned.version;
-                            if current {
-                                stats.current += 1;
-                                println!(
-                                    "{} {}@{} 👌",
-                                    pinned.publish_time.to_string().bright_black(),
-                                    fullname,
-                                    pinned.version.bold(),
-                                )
-                            } else {
-                                stats.dated += 1;
-                                let lag = pinned.publish_time - latest.publish_time;
-                                println!(
-                                    "{} {}@{} -> {} upgrade available {}",
-                                    pinned.publish_time.to_string().bright_black(),
-                                    fullname.bold(),
-                                    pinned.version.bold().bright_yellow(),
-                                    latest.version.bold().bright_green(),
-                                    HumanTime::from(lag).to_string().bold()
-                                )
-                            };
+                if let Some(pinned) = client.pinned_version(&org, &artifact, &rev)? {
+                    if let Some(latest) = client.latest_version(&org, &artifact)? {
+                        if latest.version == pinned.version {
+                            println!(
+                                "{} {}@{} 👌",
+                                pinned.publish_time.to_string().bright_black(),
+                                fullname,
+                                pinned.version.bold(),
+                            );
+                            return Ok(Stats {
+                                current: stats.current + 1,
+                                ..stats
+                            });
+                        } else {
+                            let lag = pinned.publish_time - latest.publish_time;
+                            println!(
+                                "{} {}@{} -> {} upgrade available {}",
+                                pinned.publish_time.to_string().bright_black(),
+                                fullname.bold(),
+                                pinned.version.bold().bright_yellow(),
+                                latest.version.bold().bright_green(),
+                                HumanTime::from(lag).to_string().bold()
+                            );
+                            return Ok(Stats {
+                                dated: stats.dated + 1,
+                                ..stats
+                            });
                         }
                     }
-                    _ => {
-                        stats.unknown += 1;
-                        println!(
-                            "⚠️ no information found on {}@{}",
-                            fullname.bold(),
-                            rev.bold()
-                        )
-                    }
                 }
-                sleep(REQUEST_DELAY);
-                Ok(stats)
+                println!(
+                    "⚠️ no information found on {}@{}",
+                    fullname.bold(),
+                    rev.bold()
+                );
+                Ok(Stats {
+                    unknown: stats.unknown + 1,
+                    ..stats
+                })
             });
     let Stats {
         dated,
