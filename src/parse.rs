@@ -20,6 +20,19 @@ pub struct Dependency {
     pub rev: String,
 }
 
+impl Dependency {
+    pub fn fullname(&self) -> String {
+        format!(
+            "{}/{}",
+            self.org,
+            self.name
+                .as_ref()
+                .or_else(|| self.module.as_ref())
+                .unwrap_or(&"?".to_string())
+        )
+    }
+}
+
 pub trait Parser {
     fn parse(
         &self,
