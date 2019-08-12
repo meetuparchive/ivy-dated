@@ -92,3 +92,22 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("Dated: {} Current: {} Unknown: {}", dated, current, unknown);
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn options_profiles_file_param() -> Result<(), Box<dyn Error>> {
+        let Options { ivy } = Options::from_iter_safe(&["ivy-dated", "path/to/test.xml"])?;
+        assert_eq!(ivy, PathBuf::from("path/to/test.xml"));
+        Ok(())
+    }
+
+    #[test]
+    fn options_defines_a_default_file() -> Result<(), Box<dyn Error>> {
+        let Options { ivy } = Options::from_iter_safe(&["ivy-dated"])?;
+        assert_eq!(ivy, PathBuf::from("ivy.xml"));
+        Ok(())
+    }
+}
