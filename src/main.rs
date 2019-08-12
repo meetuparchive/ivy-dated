@@ -43,11 +43,9 @@ fn main() -> Result<(), Box<dyn Error>> {
                     rev,
                 } = dependency;
                 let artifact = name.or(module).unwrap_or_default();
-                match client.pinned_version(org.clone(), artifact.clone(), rev.clone())? {
+                match client.pinned_version(&org, &artifact, &rev)? {
                     Some(pinned) => {
-                        if let Some(latest) =
-                            client.latest_version(org.clone(), artifact.clone())?
-                        {
+                        if let Some(latest) = client.latest_version(&org, &artifact)? {
                             let current = latest.version == pinned.version;
                             if current {
                                 stats.current += 1;
@@ -99,7 +97,7 @@ mod tests {
 
     #[test]
     fn options_profiles_file_param() -> Result<(), Box<dyn Error>> {
-        let Options { ivy } = Options::from_iter_safe(&["ivy-dated", "path/to/test.xml"])?;
+        let Options { ivy } = Options::from_iter_safe(&["ivy-dated", "-f", "path/to/test.xml"])?;
         assert_eq!(ivy, PathBuf::from("path/to/test.xml"));
         Ok(())
     }

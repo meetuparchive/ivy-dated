@@ -50,24 +50,24 @@ impl Into<Version> for Doc {
 pub trait Resolver {
     fn pinned_version(
         &self,
-        group: String,
-        artifact: String,
-        version: String,
+        group: &str,
+        artifact: &str,
+        version: &str,
     ) -> Result<Option<Version>, Box<dyn Error>>;
 
     fn latest_version(
         &self,
-        group: String,
-        artifact: String,
+        group: &str,
+        artifact: &str,
     ) -> Result<Option<Version>, Box<dyn Error>>;
 }
 
 impl Resolver for Client {
     fn pinned_version(
         &self,
-        group: String,
-        artifact: String,
-        version: String,
+        group: &str,
+        artifact: &str,
+        version: &str,
     ) -> Result<Option<Version>, Box<dyn Error>> {
         let url = format!(
             "http://search.maven.org/solrsearch/select?q=g:%22{group}%22+AND+a:%22{artifact}%22+AND+v:%22{version}%22&wt=json",
@@ -82,8 +82,8 @@ impl Resolver for Client {
 
     fn latest_version(
         &self,
-        group: String,
-        artifact: String,
+        group: &str,
+        artifact: &str,
     ) -> Result<Option<Version>, Box<dyn Error>> {
         let url = format!(
             "http://search.maven.org/solrsearch/select?q=g:%22{group}%22+AND+a:%22{artifact}%22&wt=json&core=gav",
