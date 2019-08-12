@@ -1,6 +1,5 @@
 use chrono_humanize::HumanTime;
 use colored::Colorize;
-
 use reqwest::Client;
 use std::{error::Error, path::PathBuf, thread::sleep, time::Duration};
 use structopt::StructOpt;
