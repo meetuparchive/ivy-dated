@@ -13,4 +13,4 @@ cargo run -q -- -f path/to/ivy.xml
 This is a [rustlang](https://www.rust-lang.org/en-US/) application.
 Go grab yourself a copy with [rustup](https://rustup.rs/).
 
-Meetup Inc
+Meetup, Inc.
