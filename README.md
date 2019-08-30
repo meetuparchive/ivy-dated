@@ -1,4 +1,4 @@
-# ivy dated [![Build Status](https://travis-ci.com/meetup/ivy-dated.svg?branch=master)](https://travis-ci.com/meetup/ivy-dated)
+# ivy dated [![Build Status](https://travis-ci.com/meetup/ivy-dated.svg?branch=master)](https://travis-ci.com/meetup/ivy-dated)  [![](https://github.com/meetup/ivy-dated/workflows/Main/badge.svg)](https://github.com/meetup/ivy-dated/actions)
 
 > computes the "dated-ness" of a project's dependencies based by cross referencing an ivy configuration with maven central
 
