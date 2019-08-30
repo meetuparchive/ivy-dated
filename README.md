@@ -3,7 +3,7 @@
 > computes the "dated-ness" of a project's dependencies based by cross referencing an ivy configuration with maven central
 
 <p align="center">
-  <img width="460" src="example.png">
+  <img src="example.png">
 </p>
 
 ## 📦 install
